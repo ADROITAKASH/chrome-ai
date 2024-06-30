@@ -1,11 +1,11 @@
 import { ModeToggle } from '@/components/ModeToggle';
+import ChatLayout from '@/components/chat/ChatLayout';
 
 export default function Home() {
 
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between p-24'>
-      <h1 className='m-auto font-extrabold text-7xl'>Hello World</h1>
-      <ModeToggle/>
+    <main className='flex h-screen flex-col items-center justify-between p-4'>
+      <ChatLayout />
     </main>
   );
 }
