@@ -1,7 +1,7 @@
 import React from 'react';
 import useAnimatedGradient from '@/hooks/useAnimatedGradient';
 
-const LoadingAnimation: React.FC = () => {
+const LoadingAnimation: React.FC<{ center?: boolean }> = ({ center = false }) => {
   const duration = 3000; // Duration in milliseconds
   const offset = useAnimatedGradient(duration);
 
@@ -14,8 +14,12 @@ const LoadingAnimation: React.FC = () => {
     backgroundPosition: `${offset}% 50%`,
   };
 
+  const containerClasses = center
+    ? 'flex flex-col items-center justify-center space-y-4 p-4 max-w-5xl h-full m-auto'
+    : 'flex flex-col items-start justify-start space-y-4 p-4 max-w-5xl';
+
   return (
-    <div className='flex flex-col items-start justify-start space-y-4 p-4 max-w-5xl'>
+    <div className={containerClasses}>
       <div
         className='w-full h-5 rounded-lg animate-scroll'
         style={gradientStyle}

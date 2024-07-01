@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { AISession } from '@/components/chat/ChatLayout';
 import { Send, Edit3, Trash } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 export const Conversation: React.FC<{
   aiSession: AISession;
@@ -162,7 +163,7 @@ export const Conversation: React.FC<{
     };
 
     return (
-      <div className='h-full w-full flex flex-col text-foreground'>
+      <div className='h-full w-full flex flex-col text-foreground border border-l-0 rounded-r-3xl'>
         <div className='flex items-center justify-between text-2xl font-semibold px-4 py-4'>
           {editMode === currentSessionId ? (
             <div className='flex items-center w-full'>
@@ -173,7 +174,7 @@ export const Conversation: React.FC<{
               />
               <Button
                 onClick={() => handleSaveEdit(currentSessionId!)}
-                className='ml-2 bg-primary text-primary-foreground hover:bg-primary/90 p-2 rounded'
+                className='ml-2 bg-primary text-primary-foreground hover:bg-primary/90 p-2 rounded-2xl'
               >
                 Save
               </Button>
@@ -205,13 +206,13 @@ export const Conversation: React.FC<{
         </div>
         <Separator />
         <div className='flex-1 overflow-y-auto p-4'>
-          <div className='text-lg font-medium'>
+          <div className={cn('text-lg font-medium', !chatHistory.length && 'flex items-center justify-center h-full')}>
             {isAIAvailable === null ? (
               'Checking AI availability...'
             ) : isAIAvailable ? (
               <>
                 {!chatHistory.length ? (
-                  <div className='text-center'>Start a conversation</div>
+                  <div className='text-center font-mono text-2xl'>Start a conversation</div>
                 ) : (
                   chatHistory.map((msg) => (
                     <div
@@ -226,8 +227,8 @@ export const Conversation: React.FC<{
                       ) : (
                         <div
                           className={`max-w-xl px-4 py-2 rounded-2xl ${msg.role === 'user'
-                              ? 'bg-primary/10'
-                              : 'bg-transparent'
+                            ? 'bg-primary/10'
+                            : 'bg-transparent'
                             } text-${msg.role === 'user' ? 'primary/90' : 'card-foreground'
                             }`}
                         >

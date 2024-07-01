@@ -80,7 +80,7 @@ export const LiveChat: React.FC<{
   }, []);
 
   return (
-    <div className='h-full w-full flex flex-col text-foreground'>
+    <div className='h-full w-full flex flex-col text-foreground border border-l-0 rounded-r-3xl'>
       <div className='flex-1 overflow-y-auto p-6'>
         <div className='text-lg font-medium'>
           {isAIAvailable === null ? (
@@ -88,8 +88,8 @@ export const LiveChat: React.FC<{
           ) : isAIAvailable ? (
             <>
               <div className='mt-4'>
-                <div className='max-w-full p-4 rounded-lg text-center bg-transparent text-card-foreground'>
-                  {isLoading ? <LoadingAnimation /> : responseText}
+                <div className='max-w-full h-full p-4 rounded-lg text-center bg-transparent text-card-foreground'>
+                  {isLoading ? <LoadingAnimation center={true}/> : responseText == 'Start typing to see the response.' ?  <div className='text-center font-mono text-2xl'>Start typing to see the response.</div> : responseText}
                 </div>
               </div>
             </>

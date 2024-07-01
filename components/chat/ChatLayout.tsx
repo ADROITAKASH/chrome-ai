@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -11,13 +11,13 @@ import { cn } from '@/lib/utils';
 import { Conversation } from '@/components/chat/Conversation';
 import { LiveChat } from '@/components/chat/LiveChat';
 import { Separator } from '@/components/ui/separator';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs } from '@/components/ui/tabs';
 import { Edit3, PlusCircle, Search, Trash } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Switch } from '../ui/switch';
+import { ModeToggle } from '../ModeToggle';
+import Contact from '../Contact';
 
 declare global {
   interface Window {
@@ -30,12 +30,11 @@ export interface AISession {
 }
 
 export default function ChatLayout() {
-  const defaultLayout = [265, 340, 755];
+  const defaultLayout = [23, 77];
 
   const [aiSession, setAISession] = useState<AISession | null>(null);
   const [isAIAvailable, setIsAIAvailable] = useState<boolean | null>(null);
   const [isLiveChat, setIsLiveChat] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState([265, 440, 655]);
   const [searchTerm, setSearchTerm] = useState('');
   const [chatSessions, setChatSessions] = useState<
     { id: string; name: string; history: any[] }[]
@@ -71,6 +70,10 @@ export default function ChatLayout() {
       setCurrentSessionId(storedSessions[0].id);
     }
   }, []);
+
+  useEffect(() => {
+    chatSessions.length <= 0 && createNewChat()
+  }, [chatSessions])
 
   const createNewChat = () => {
     const newSession = {
@@ -128,17 +131,19 @@ export default function ChatLayout() {
       }}
       className='h-full items-stretch bg-background text-foreground'
     >
-      <React.Fragment>
+      <Fragment>
         <ResizablePanel
-          defaultSize={defaultLayout[1]}
+          defaultSize={defaultLayout[0]}
           minSize={20}
-          maxSize={35}
-          className='bg-foreground/5 rounded-l-3xl'
+          maxSize={25}
+          className='bg-foreground/5 rounded-l-3xl border border-r-0'
         >
           <Tabs defaultValue='Conversations'>
             <div className='flex items-center justify-between text-2xl font-semibold px-4 py-4'>
               <h1 className='p-2'>Gemini Nano</h1>
+              <ModeToggle />
             </div>
+
             <Separator />
 
             <div className="p-4">
@@ -154,18 +159,19 @@ export default function ChatLayout() {
 
             <Separator />
 
-            <div
-              className={`${isLiveChat ? 'pointer-events-none opacity-50' : ''
-                }`}
-            >
+            <div className={`${isLiveChat ? 'pointer-events-none opacity-50' : ''}`}>
               <div className='flex items-center px-4 py-2 space-x-2 pt-4'>
-                <div className='flex items-center w-full bg-transparent focus:bg-input/50 rounded-xl focus-within:bg-input/90 hover:bg-input/30'>
-                  <Search className='h-5 w-5 text-muted-foreground ml-2' />
+                <div className='flex group items-center w-full bg-transparent focus:bg-input/50 rounded-xl focus-within:bg-input/90 text-muted-foreground focus-within:text-foreground'>
+                  <Search className='h-5 w-5 ml-2 group-hover:text-foreground' />
                   <Input
                     placeholder='Search'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className='w-full bg-transparent text-foreground border-none focus:ring-0 focus:outline-none rounded-xl pl-2'
+                    className='w-full bg-transparent text-foreground border-none focus:ring-0 active:border-transparent focus:outline-none rounded-xl pl-2'
+                    style={{
+                      boxShadow: 'none',
+                      outline: 'none',
+                    }}
                   />
                 </div>
                 <Button
@@ -175,14 +181,16 @@ export default function ChatLayout() {
                   <PlusCircle className='h-7 w-7 pr-2' /> New Chat
                 </Button>
               </div>
-              <div className="p-4 pl-8 ">
+
+              <div className={cn('p-4 pl-8', chatSessions.length <= 0 && 'pointer-events-none opacity-50')}>
                 <div className="group flex flex-row justify-center items-center relative text-center cursor-pointer" onClick={clearAllSessions}>
-                  <div className="flex-grow border-t border-red-300/80 group-hover:border-red-300"></div>
-                  <h3 className="z-10 text-red-300/80 group-hover:text-red-300 focus:outline-none px-4">
+                  <div className="flex-grow border-t border-muted group-hover:border-red-300/30"></div>
+                  <h3 className="z-10 text-primary/50 group-hover:text-red-300 focus:outline-none px-4 font-mono text-sm">
                     Clear All
                   </h3>
                 </div>
               </div>
+
               <div className='space-y-4 px-4 py-2'>
                 {chatSessions
                   .filter((session) =>
@@ -247,7 +255,7 @@ export default function ChatLayout() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel
-          defaultSize={defaultLayout[2]}
+          defaultSize={defaultLayout[1]}
           className='bg-foreground/5 rounded-r-3xl'
         >
           {aiSession && isAIAvailable !== null ? (
@@ -264,7 +272,7 @@ export default function ChatLayout() {
               />
             )
           ) : (
-            <div className='flex items-center justify-center flex-1'>
+            <div className='flex items-center justify-center flex-1 rounded-r-3xl border border-l-0 h-full w-full'>
               {isAIAvailable === null ? (
                 'Checking AI availability...'
               ) : (
@@ -273,14 +281,13 @@ export default function ChatLayout() {
             </div>
           )}
         </ResizablePanel>
-      </React.Fragment>
+      </Fragment>
       <div
         className={cn(
-          isCollapsed &&
-          'min-w-[20%] max-w-[25%] transition-all duration-300 ease-in-out'
+          'w-[20%] transition-all duration-300 ease-in-out'
         )}
       >
-        <h3 className='p-4 text-lg font-medium'>Hello world</h3>
+        <Contact/>
       </div>
     </ResizablePanelGroup>
   );
