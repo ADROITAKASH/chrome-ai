@@ -13,8 +13,8 @@ const Contact: React.FC = () => {
           </div>
           <GlowingStarsBackgroundCard url="https://link.medium.com/keqpglVxTKb">
             <div className="pt-2">
-              <h2 className="font-mono tracking-wider font-black text-xl mb-2">Chrome’s Gemini Nano</h2>
-              <p className="font-mono text-sm font-medium text-primary/80">Your Browser Just Got Smarter!</p>
+              <h2 className="font-mono tracking-wider font-black text-sm xl:text-md mb-2">Chrome’s Gemini Nano</h2>
+              <p className="font-mono text-xs font-medium text-primary/80 hidden xl:text-sm 2xl:block">Your Browser Just Got Smarter!</p>
             </div>
           </GlowingStarsBackgroundCard>
         </div>
@@ -41,7 +41,7 @@ const Contact: React.FC = () => {
 
       {/* Contact */}
       <div className='flex flex-col gap-5 mt-auto mx-auto'>
-        <div className='flex gap-7 m-auto text-primary/30'>
+        <div className='flex gap-7 m-auto text-primary/30 text-sm'>
           {/* Instagram */}
           <a href='https://www.instagram.com/akashtdev/' target="_blank"
             rel="noopener noreferrer" className='font-mono hover:text-pink-300 hover:font-semibold'>Instagram</a>

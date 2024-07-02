@@ -1,3 +1,5 @@
+'use client'
+
 import React, {
   useState,
   useEffect,
@@ -5,17 +7,22 @@ import React, {
   ChangeEvent,
   useCallback,
   ReactElement,
+  ReactNode,
 } from 'react';
 
 import { AISession } from '@/components/chat/ChatLayout';
 
 import LoadingAnimation from '@/components/LoadingAnimation';
 import { Input } from '@/components/ui/input';
+import { SideMenu } from '../SideMenu';
 
-export const LiveChat: React.FC<{
+interface LiveChatProps {
   aiSession: AISession;
   isAIAvailable: boolean | null;
-}> = ({ aiSession, isAIAvailable }) => {
+  renderSidebar: () => ReactNode;
+}
+
+export const LiveChat: React.FC<LiveChatProps> = ({ aiSession, isAIAvailable, renderSidebar }) => {
   const [inputText, setInputText] = useState<string>('');
   const [responseText, setResponseText] = useState<string>(
     'Start typing to see the response.'
@@ -25,27 +32,21 @@ export const LiveChat: React.FC<{
 
   const fetchAIResponse = useCallback(
     async (value: string, retries = 3) => {
-      if (isAIAvailable && aiSession && value) {
-        setIsLoading(true);
-        try {
-          let response = '', trial = 0;
-          while (response == "" && trial < retries) {
-            const stream = aiSession.promptStreaming(value);
-            for await (const chunk of await stream) {
-              response = chunk;
-            }
-            trial++;
+      setIsLoading(true);
+      try {
+        let response = '', trial = 0;
+        while (response == "" && trial < retries) {
+          const stream = aiSession.promptStreaming(value);
+          for await (const chunk of await stream) {
+            response = chunk;
           }
-          setResponseText(response);
-          setIsLoading(false);
-        } catch (error: any) {
-          console.error(error.message);
-          setIsLoading(false);
+          trial++;
         }
-      } else {
-        setResponseText(
-          'window.ai is not available in your browser. Please try again later.'
-        );
+        setResponseText(response);
+        setIsLoading(false);
+      } catch (error: any) {
+        console.error(error.message);
+        setIsLoading(false);
       }
     },
     [isAIAvailable, aiSession]
@@ -100,7 +101,8 @@ export const LiveChat: React.FC<{
   };
 
   return (
-    <div className='h-full w-full flex flex-col text-foreground border border-l-0 rounded-r-3xl'>
+    <div className='h-full w-full flex flex-col text-foreground border lg:border-l-0 rounded-3xl lg:rounded-l-none'>
+      <div className='p-4'><SideMenu renderSidebar={renderSidebar} /></div>
       <div className='flex-1 overflow-y-auto p-6'>
         <div className='text-lg font-medium'>
           <div className='mt-4'>

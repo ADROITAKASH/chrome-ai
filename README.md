@@ -4,7 +4,7 @@
 </a>
 
 <p align="center">
-  Experience our AI chatbot demo using Google's Gemini Nano, running entirely in Chrome without server dependencies.
+  AI chatbot demo using Google's Gemini Nano, running entirely in Chrome without server dependencies.
 </p>
 
 <p align="center">
@@ -73,7 +73,7 @@ Your contributions can help this project grow. Feel free to submit feature enhan
 
 ## Licensing
 
-This project is open-sourced under the MIT License. Review the [LICENSE](LICENSE.md) for more details.
+This project is open-sourced under the MIT License. Review the [LICENSE](LICENSE) for more details.
 
 ## Stay Connected
 

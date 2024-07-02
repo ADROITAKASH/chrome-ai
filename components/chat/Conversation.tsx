@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, FormEvent } from 'react';
+import React, { useState, useEffect, useRef, FormEvent, ReactNode } from 'react';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,23 +8,26 @@ import { AISession } from '@/components/chat/ChatLayout';
 import { Send, Edit3, Trash } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { SideMenu } from '../SideMenu';
 
-export const Conversation: React.FC<{
+interface ConversationProps {
   aiSession: AISession;
   isAIAvailable: boolean | null;
   chatSessions: { id: string; name: string; history: any[] }[];
-  setChatSessions: React.Dispatch<
-    React.SetStateAction<{ id: string; name: string; history: any[] }[]>
-  >;
+  setChatSessions: React.Dispatch<React.SetStateAction<{ id: string; name: string; history: any[] }[]>>;
   currentSessionId: string | null;
   setCurrentSessionId: React.Dispatch<React.SetStateAction<string | null>>;
-}> = ({
+  renderSidebar: () => ReactNode;
+}
+
+export const Conversation: React.FC<ConversationProps> = ({
   aiSession,
   isAIAvailable,
   chatSessions,
   setChatSessions,
   currentSessionId,
   setCurrentSessionId,
+  renderSidebar,
 }) => {
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const [inputText, setInputText] = useState('');
@@ -149,8 +152,9 @@ export const Conversation: React.FC<{
     };
 
     return (
-      <div className='h-full w-full flex flex-col text-foreground border border-l-0 rounded-r-3xl'>
+      <div className='h-full w-full flex flex-col text-foreground border lg:border-l-0 rounded-3xl lg:rounded-l-none'>
         <div className='flex items-center justify-between text-2xl font-semibold px-4 py-4'>
+          <SideMenu renderSidebar={renderSidebar} />
           {editMode === currentSessionId ? (
             <div className='flex items-center w-full'>
               <Input

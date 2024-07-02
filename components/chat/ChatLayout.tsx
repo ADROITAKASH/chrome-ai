@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '../ui/switch';
 import { ModeToggle } from '../ModeToggle';
 import Contact from '../Contact';
+import { SideMenu } from '../SideMenu';
 
 declare global {
   interface Window {
@@ -118,6 +119,120 @@ export default function ChatLayout() {
     setEditName('');
   };
 
+  function renderSidebar() {
+    return <Tabs defaultValue='Conversations'>
+      <div className='flex items-center justify-between text-2xl font-semibold px-4 py-4'>
+        <h1 className='p-2'>Gemini Nano</h1>
+        <ModeToggle />
+      </div>
+
+      <Separator />
+
+      <div className={`p4 ${!(aiSession && isAIAvailable !== null) ? 'pointer-events-none opacity-50' : ''}`}>
+        <div className='bg-muted/35 shadow p-6 w-full m-auto rounded-none'>
+          <div className='flex items-center justify-between'>
+            <span className={cn('font-semibold', isLiveChat ? 'text-primary' : 'text-muted-foreground')}>
+              Live chat
+            </span>
+            <Switch checked={isLiveChat} onCheckedChange={handleToggle} />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className={`${(isLiveChat || !(aiSession && isAIAvailable !== null)) ? 'pointer-events-none opacity-50' : ''}`}>
+        <div className='flex items-center px-4 py-2 space-x-2 pt-4'>
+          <div className='flex group items-center w-full bg-transparent focus:bg-input/50 rounded-xl focus-within:bg-input/90 text-muted-foreground focus-within:text-foreground'>
+            <Search className='h-5 w-5 ml-2 group-hover:text-foreground' />
+            <Input
+              placeholder='Search'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className='w-full bg-transparent text-foreground border-none focus:ring-0 active:border-transparent focus:outline-none rounded-xl pl-2'
+              style={{
+                boxShadow: 'none',
+                outline: 'none',
+              }} />
+          </div>
+          <Button
+            onClick={createNewChat}
+            className='bg-transparent text-[#91B98E] hover:bg-transparent p-2 rounded'
+          >
+            <PlusCircle className='h-7 w-7 pr-2' /> New Chat
+          </Button>
+        </div>
+
+        <div className={cn('p-4 pl-8', chatSessions.length <= 0 && 'pointer-events-none opacity-50')}>
+          <div className="group flex flex-row justify-center items-center relative text-center cursor-pointer" onClick={clearAllSessions}>
+            <div className="flex-grow border-t border-muted group-hover:border-red-300/30"></div>
+            <h3 className="z-10 text-primary/50 group-hover:text-red-300 focus:outline-none px-4 font-mono text-sm">
+              Clear All
+            </h3>
+          </div>
+        </div>
+
+        <div className='space-y-4 px-4 py-2'>
+          {chatSessions
+            .filter((session) => session.name
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+            )
+            .map((session) => (
+              <div
+                key={session.id}
+                className={cn(
+                  'group flex items-center justify-between p-6 border bg-card/30 text-muted-foreground rounded-lg shadow-md cursor-pointer hover:bg-muted/10 transition-all duration-300 max-w-md m-auto',
+                  currentSessionId === session.id &&
+                  'bg-muted/50 text-card-foreground border-card-foreground/10'
+                )}
+                onClick={() => setCurrentSessionId(session.id)}
+              >
+                {editMode === session.id ? (
+                  <div className='flex items-center w-full'>
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className='w-full bg-input text-foreground' />
+                    <Button
+                      onClick={() => handleSaveEdit(session.id)}
+                      className='ml-2 bg-primary text-primary-foreground hover:bg-primary/90 p-2 rounded'
+                    >
+                      Save
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <span className='font-semibold'>{session.name}</span>
+                    <div className='flex items-center space-x-2'>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(session.id);
+                        }}
+                        className='bg-transparent text-transparent group-hover:text-primary/30 hover:text-primary/80 hover:bg-transparent p-2 rounded'
+                      >
+                        <Edit3 className='h-5 w-5' />
+                      </Button>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteSession(session.id);
+                        }}
+                        className='bg-transparent text-red-300/50 hover:text-red-300/90 hover:bg-transparent p-2 rounded'
+                      >
+                        <Trash className='h-5 w-5' />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    </Tabs>;
+  }
+
   return (
     <ResizablePanelGroup
       direction='horizontal'
@@ -133,131 +248,18 @@ export default function ChatLayout() {
           defaultSize={defaultLayout[0]}
           minSize={20}
           maxSize={25}
-          className='bg-foreground/5 rounded-l-3xl border border-r-0'
+          className='bg-foreground/5 rounded-l-3xl border border-r-0 hidden lg:block'
         >
-          <Tabs defaultValue='Conversations'>
-            <div className='flex items-center justify-between text-2xl font-semibold px-4 py-4'>
-              <h1 className='p-2'>Gemini Nano</h1>
-              <ModeToggle />
-            </div>
-
-            <Separator />
-
-            <div className={`p4 ${!(aiSession && isAIAvailable !== null) ? 'pointer-events-none opacity-50' : ''}`}>
-              <div className='bg-muted/35 shadow p-6 w-full m-auto rounded-none'>
-                <div className='flex items-center justify-between'>
-                  <span className={cn('font-semibold', isLiveChat ? 'text-primary' : 'text-muted-foreground')}>
-                    Live chat
-                  </span>
-                  <Switch checked={isLiveChat} onCheckedChange={handleToggle} />
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className={`${(isLiveChat || !(aiSession && isAIAvailable !== null)) ? 'pointer-events-none opacity-50' : ''}`}>
-              <div className='flex items-center px-4 py-2 space-x-2 pt-4'>
-                <div className='flex group items-center w-full bg-transparent focus:bg-input/50 rounded-xl focus-within:bg-input/90 text-muted-foreground focus-within:text-foreground'>
-                  <Search className='h-5 w-5 ml-2 group-hover:text-foreground' />
-                  <Input
-                    placeholder='Search'
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className='w-full bg-transparent text-foreground border-none focus:ring-0 active:border-transparent focus:outline-none rounded-xl pl-2'
-                    style={{
-                      boxShadow: 'none',
-                      outline: 'none',
-                    }}
-                  />
-                </div>
-                <Button
-                  onClick={createNewChat}
-                  className='bg-transparent text-[#91B98E] hover:bg-transparent p-2 rounded'
-                >
-                  <PlusCircle className='h-7 w-7 pr-2' /> New Chat
-                </Button>
-              </div>
-
-              <div className={cn('p-4 pl-8', chatSessions.length <= 0 && 'pointer-events-none opacity-50')}>
-                <div className="group flex flex-row justify-center items-center relative text-center cursor-pointer" onClick={clearAllSessions}>
-                  <div className="flex-grow border-t border-muted group-hover:border-red-300/30"></div>
-                  <h3 className="z-10 text-primary/50 group-hover:text-red-300 focus:outline-none px-4 font-mono text-sm">
-                    Clear All
-                  </h3>
-                </div>
-              </div>
-
-              <div className='space-y-4 px-4 py-2'>
-                {chatSessions
-                  .filter((session) =>
-                    session.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                  )
-                  .map((session) => (
-                    <div
-                      key={session.id}
-                      className={cn(
-                        'group flex items-center justify-between p-6 border bg-card/30 text-muted-foreground rounded-lg shadow-md cursor-pointer hover:bg-muted/10 transition-all duration-300 max-w-md m-auto',
-                        currentSessionId === session.id &&
-                        'bg-muted/50 text-card-foreground border-card-foreground/10'
-                      )}
-                      onClick={() => setCurrentSessionId(session.id)}
-                    >
-                      {editMode === session.id ? (
-                        <div className='flex items-center w-full'>
-                          <Input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className='w-full bg-input text-foreground'
-                          />
-                          <Button
-                            onClick={() => handleSaveEdit(session.id)}
-                            className='ml-2 bg-primary text-primary-foreground hover:bg-primary/90 p-2 rounded'
-                          >
-                            Save
-                          </Button>
-                        </div>
-                      ) : (
-                        <>
-                          <span className='font-semibold'>{session.name}</span>
-                          <div className='flex items-center space-x-2'>
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(session.id);
-                              }}
-                              className='bg-transparent text-transparent group-hover:text-primary/30 hover:text-primary/80 hover:bg-transparent p-2 rounded'
-                            >
-                              <Edit3 className='h-5 w-5' />
-                            </Button>
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteSession(session.id);
-                              }}
-                              className='bg-transparent text-red-300/50 hover:text-red-300/90 hover:bg-transparent p-2 rounded'
-                            >
-                              <Trash className='h-5 w-5' />
-                            </Button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </Tabs>
+          {renderSidebar()}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel
           defaultSize={defaultLayout[1]}
-          className='bg-foreground/5 rounded-r-3xl'
+          className='bg-foreground/5 rounded-3xl lg:rounded-l-none'
         >
           {aiSession && isAIAvailable !== null ? (
             isLiveChat ? (
-              <LiveChat aiSession={aiSession} isAIAvailable={isAIAvailable} />
+              <LiveChat aiSession={aiSession} isAIAvailable={isAIAvailable} renderSidebar={renderSidebar} />
             ) : (
               <Conversation
                 aiSession={aiSession}
@@ -266,10 +268,11 @@ export default function ChatLayout() {
                 setChatSessions={setChatSessions}
                 currentSessionId={currentSessionId}
                 setCurrentSessionId={setCurrentSessionId}
+                renderSidebar={renderSidebar}
               />
             )
           ) : (
-            <div className='flex items-center justify-center flex-1 rounded-r-3xl border border-l-0 h-full w-full'>
+            <div className='flex items-center justify-center flex-1 rounded-3xl lg:rounded-l-none border lg:border-l-0 h-full w-full'>
               {isAIAvailable === null ? (
                 'Checking AI availability...'
               ) : (
@@ -280,9 +283,7 @@ export default function ChatLayout() {
         </ResizablePanel>
       </Fragment>
       <div
-        className={cn(
-          'w-[20%] transition-all duration-300 ease-in-out'
-        )}
+        className="w-[20%] transition-all duration-300 ease-in-out hidden xl:block"
       >
         <Contact />
       </div>
