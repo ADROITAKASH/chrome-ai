@@ -4,12 +4,12 @@ import React, {
   useRef,
   ChangeEvent,
   useCallback,
+  ReactElement,
 } from 'react';
 
 import { AISession } from '@/components/chat/ChatLayout';
 
 import LoadingAnimation from '@/components/LoadingAnimation';
-import NotAvailable from '@/components/chat/NotAvailable';
 import { Input } from '@/components/ui/input';
 
 export const LiveChat: React.FC<{
@@ -28,26 +28,19 @@ export const LiveChat: React.FC<{
       if (isAIAvailable && aiSession && value) {
         setIsLoading(true);
         try {
-          const response = await aiSession.prompt(value);
-          setResponseText(response);
-          console.clear();
-          console.log(value);
-          console.log(response);
-          setIsLoading(false);
-        } catch (error) {
-          console.clear();
-          console.log(value);
-          console.error('Error fetching AI response:', error);
-          if (retries > 0) {
-            setTimeout(() => {
-              fetchAIResponse(value, retries - 1);
-            }, 300); // Retry after 300 milliseconds
-          } else {
-            setResponseText(
-              'Failed to fetch AI response after multiple attempts. Please try again later.'
-            );
-            setIsLoading(false);
+          let response = '', trial = 0;
+          while (response == "" && trial < retries) {
+            const stream = aiSession.promptStreaming(value);
+            for await (const chunk of await stream) {
+              response = chunk;
+            }
+            trial++;
           }
+          setResponseText(response);
+          setIsLoading(false);
+        } catch (error: any) {
+          console.error(error.message);
+          setIsLoading(false);
         }
       } else {
         setResponseText(
@@ -79,23 +72,42 @@ export const LiveChat: React.FC<{
     };
   }, []);
 
+  const getFormattedText = (input: string): ReactElement[] => {
+    if (!input) return [];
+
+    // Normalize the input to ensure uniform line breaks
+    const normalizedInput = input.replace(/\r\n|\r/g, '\n');
+
+    // Split the input text by line breaks and map each segment to JSX
+    const lines = normalizedInput.split('\n');
+    const jsxOutput: ReactElement[] = [];
+
+    lines.forEach((line, index) => {
+      if (line.trim().startsWith('*')) {
+        const cleanLine = line.trim().slice(1).trim().replace(/\*+/g, '');
+        jsxOutput.push(<b key={`b${index}`}>{cleanLine}</b>);
+        jsxOutput.push(<br key={`br${index}`} />);
+      } else {
+        const cleanLine = line.replace(/\*+/g, '').trim();
+        if (cleanLine.length > 0) {
+          jsxOutput.push(<span key={`span${index}`}>{cleanLine}</span>);
+          jsxOutput.push(<br key={`br${index}`} />);
+        }
+      }
+    });
+
+    return jsxOutput;
+  };
+
   return (
     <div className='h-full w-full flex flex-col text-foreground border border-l-0 rounded-r-3xl'>
       <div className='flex-1 overflow-y-auto p-6'>
         <div className='text-lg font-medium'>
-          {isAIAvailable === null ? (
-            'Checking AI availability...'
-          ) : isAIAvailable ? (
-            <>
-              <div className='mt-4'>
-                <div className='max-w-full h-full p-4 rounded-lg text-center bg-transparent text-card-foreground'>
-                  {isLoading ? <LoadingAnimation center={true}/> : responseText == 'Start typing to see the response.' ?  <div className='text-center font-mono text-2xl'>Start typing to see the response.</div> : responseText}
-                </div>
-              </div>
-            </>
-          ) : (
-            <NotAvailable />
-          )}
+          <div className='mt-4'>
+            <div className='max-w-full h-full p-4 rounded-lg text-center bg-transparent text-card-foreground'>
+              {isLoading ? <LoadingAnimation center={true} /> : responseText == 'Start typing to see the response.' ? <div className='text-center font-mono text-2xl'>Start typing to see the response.</div> : getFormattedText(responseText)}
+            </div>
+          </div>
         </div>
       </div>
       <div className='bg-input/50 p-4 flex'>

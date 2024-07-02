@@ -7,11 +7,17 @@ import { cn } from '@/lib/utils';
 export const GlowingStarsBackgroundCard = ({
   className,
   children,
+  url
 }: {
   className?: string;
   children?: React.ReactNode;
+  url?: string;
 }) => {
   const [mouseEnter, setMouseEnter] = useState(false);
+
+  const handleClick = () => {
+    window.open(url, "_blank");
+  };
 
   return (
     <div
@@ -21,8 +27,9 @@ export const GlowingStarsBackgroundCard = ({
       onMouseLeave={() => {
         setMouseEnter(false);
       }}
+      onClick={handleClick}
       className={cn(
-        "bg-[linear-gradient(110deg,#111_0.6%,#0d0d0d)] p-4 max-w-md max-h-[20rem] h-full w-full rounded-xl border border-border",
+        "bg-[linear-gradient(110deg,#111_0.6%,#0d0d0d)] p-4 max-w-sm max-h-[18rem] h-full w-full rounded-xl border border-border cursor-pointer hover:border-blue-300/20",
         className
       )}
     >

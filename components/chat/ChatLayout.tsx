@@ -6,7 +6,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
-import NotAvailable from '@/components/chat/NotAvailable';
+import NotEnabled from '@/components/NotEnabled';
 import { cn } from '@/lib/utils';
 import { Conversation } from '@/components/chat/Conversation';
 import { LiveChat } from '@/components/chat/LiveChat';
@@ -27,6 +27,7 @@ declare global {
 
 export interface AISession {
   prompt: (input: string) => Promise<string>;
+  promptStreaming: (input: string) => Promise<string>;
 }
 
 export default function ChatLayout() {
@@ -70,10 +71,6 @@ export default function ChatLayout() {
       setCurrentSessionId(storedSessions[0].id);
     }
   }, []);
-
-  useEffect(() => {
-    chatSessions.length <= 0 && createNewChat()
-  }, [chatSessions])
 
   const createNewChat = () => {
     const newSession = {
@@ -146,8 +143,8 @@ export default function ChatLayout() {
 
             <Separator />
 
-            <div className="p-4">
-              <div className='bg-muted/35 border shadow rounded-lg p-6 w-full max-w-md m-auto'>
+            <div className={`p4 ${!(aiSession && isAIAvailable !== null) ? 'pointer-events-none opacity-50' : ''}`}>
+              <div className='bg-muted/35 shadow p-6 w-full m-auto rounded-none'>
                 <div className='flex items-center justify-between'>
                   <span className={cn('font-semibold', isLiveChat ? 'text-primary' : 'text-muted-foreground')}>
                     Live chat
@@ -159,7 +156,7 @@ export default function ChatLayout() {
 
             <Separator />
 
-            <div className={`${isLiveChat ? 'pointer-events-none opacity-50' : ''}`}>
+            <div className={`${(isLiveChat || !(aiSession && isAIAvailable !== null)) ? 'pointer-events-none opacity-50' : ''}`}>
               <div className='flex items-center px-4 py-2 space-x-2 pt-4'>
                 <div className='flex group items-center w-full bg-transparent focus:bg-input/50 rounded-xl focus-within:bg-input/90 text-muted-foreground focus-within:text-foreground'>
                   <Search className='h-5 w-5 ml-2 group-hover:text-foreground' />
@@ -276,7 +273,7 @@ export default function ChatLayout() {
               {isAIAvailable === null ? (
                 'Checking AI availability...'
               ) : (
-                <NotAvailable />
+                <NotEnabled />
               )}
             </div>
           )}
@@ -287,7 +284,7 @@ export default function ChatLayout() {
           'w-[20%] transition-all duration-300 ease-in-out'
         )}
       >
-        <Contact/>
+        <Contact />
       </div>
     </ResizablePanelGroup>
   );

@@ -1,41 +1,59 @@
-# Chrome AI &nbsp; | &nbsp; Gemini Nano in Chrome
+<a href="https://chrome-window-ai.vercel.app/">
+  <img alt="Next.js 14 and App Router Semantic Search." src="https://chrome-window-ai.vercel.app/cover-image.png">
+  <h1 align="center">Chrome AI | In-Browser Gemini Nano Experience</h1>
+</a>
 
-Chrome AI leverages Gemini Nano, Google’s innovative in-browser AI, to enhance web experiences by enabling powerful AI computations directly within Google Chrome.
+<p align="center">
+  Experience our AI chatbot demo using Google's Gemini Nano, running entirely in Chrome without server dependencies.
+</p>
 
-## Project Overview
+<p align="center">
+  <a href="#system-requirements"><strong>Explore Features</strong></a> ·
+  <a href="#setup-instructions"><strong>Setup Guide</strong></a> ·
+  <a href="#local-deployment"><strong>Local Deployment</strong></a>
+</p>
 
-This repository demonstrates the integration of Google's Gemini Nano within Chrome browsers, showcasing AI capabilities that can be executed directly on the client-side without any server dependency.
+<p align="center">
+  <a href="https://link.medium.com/keqpglVxTKb"><strong>Medium Article</strong></a>
+</p>
+<br/>
 
+## System Requirements
 
-## Prerequisites
+Ensure your system meets the following specifications to utilize Chrome AI effectively:
 
-### System Requirements
+- **Browser**: Chromium-based (Google Chrome, Brave, Microsoft Edge) version 127 or higher.
 
-- A Chromium-based browser version 127 or higher, such as Google Chrome, Brave, or Microsoft Edge.
+## Setup Instructions
 
-### Setting Up Gemini Nano
+### Install and Configure
 
-- **Install Chrome Canary**: Make sure you have version 127 or higher. [Download Chrome Canary](https://www.google.com/chrome/canary/).
-- **Enable Prompt API**: Navigate to `chrome://flags/#prompt-api-for-gemini-nano` and set it to "Enabled".
-- **Enable Optimization Guide**: Go to `chrome://flags/#optimization-guide-on-device-model`, set it to "Enabled BypassPerfRequirement". Restart your browser.
-- **Download Model**: Visit `chrome://components/`, check "Optimization Guide On Device Model", and update it. If it shows "0.0.0.0", click "Check for update".
-- **Verify Setup**: Launch a webpage, open the console with `F12`, and verify by typing `window.ai`.
+1. **Install Chrome Canary**: Required version 127 or above. [Download here](https://www.google.com/chrome/canary/).
+2. **Enable Prompt API**: In Chrome, navigate to `chrome://flags/#prompt-api-for-gemini-nano` and set it to "Enabled". 
+3. **Enable Optimization Guide**: Navigate to `chrome://flags/#optimization-guide-on-device-model`, setting it to "Enabled BypassPerfRequirement".
+4. **Restart Browser**: Necessary for changes to take effect.
+5. **Download Model**: Navigate to `chrome://components/`, locate "Optimization Guide On Device Model", and click "Check for update" if it shows "0.0.0.0".
 
-### Troubleshooting Tips
+### Verification
 
-If you encounter issues accessing `window.ai` after following the setup steps:
-- Try disabling and re-enabling the aforementioned options in `chrome://flags`.
-- Restart your computer completely and then attempt to access `window.ai` again.
+Open any webpage, press `F12` to open the console, and type `window.ai` to check the setup.
 
-### Test Code
+### Sample Code
 
 ```javascript
 const session = await window.ai.createTextSession();
 await session.prompt("What can you do?");
 ```
 
-## Getting Started
-To explore this demo, clone the repository and start experimenting with the integrated AI functionalities:
+### Troubleshooting
+
+If you encounter issues accessing `window.ai` or missing "Optimization Guide On Device Model" option:
+- Try disabling and re-enabling the aforementioned options in `chrome://flags`.
+- Restart your computer completely and then attempt to access `window.ai` again.
+
+## Local Deployment
+
+To run this project locally, follow these steps:
 
 ```bash
 git clone git@github.com:ADROITAKASH/chrome-ai.git
@@ -45,18 +63,18 @@ yarn
 yarn dev
 ```
 
-## Dive Deeper
+## Deep Dive
 
-Interested in learning more about in-browser AI capabilities? Check out our detailed blog post on [Medium](#).
+Learn more about the capabilities of in-browser AI by reading our detailed blog post on [Medium](https://link.medium.com/keqpglVxTKb).
 
-## Contributions Welcome!
+## Contributions
 
-We encourage contributions to help evolve this project further. Whether it's feature enhancement, bug fixes, or new ideas, your input is valuable!
+Your contributions can help this project grow. Feel free to submit feature enhancements, bug fixes, or new ideas through our GitHub repository.
 
 ## Licensing
 
-This project is released under the MIT License. For more details, see the [LICENSE](LICENSE.md) file.
+This project is open-sourced under the MIT License. Review the [LICENSE](LICENSE.md) for more details.
 
 ## Stay Connected
 
-For updates, follow me on [Twitter](https://x.com/akashtdev) and [Instagram](https://www.instagram.com/akashtdev/)
+For the latest updates, follow me on [Twitter](https://x.com/akashtdev) and [Instagram](https://www.instagram.com/akashtdev/).

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import LoadingAnimation from '@/components/LoadingAnimation';
-import NotAvailable from '@/components/chat/NotAvailable';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AISession } from '@/components/chat/ChatLayout';
@@ -51,6 +50,7 @@ export const Conversation: React.FC<{
 
     const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      event.stopPropagation();
       if (!inputText.trim()) return;
 
       const userMessage = {
@@ -76,47 +76,33 @@ export const Conversation: React.FC<{
         newChatHistory.map((msg) => `${msg.role}: ${msg.message}`).join('\n') +
         `\nuser: ${inputText}\nassistant:`;
 
+      let response = "";
+      let trial = 0;
       try {
-        const response = await getAIResponse(prompt);
-        const updatedChatHistory = newChatHistory.map((msg) =>
-          msg.id === chatHistory.length + 2
-            ? {
-              ...msg,
-              message: response || 'Sorry, something went wrong.',
-              isLoading: false,
-            }
-            : msg
-        );
-        setChatHistory(updatedChatHistory);
-        updateSessionHistory(updatedChatHistory);
-      } catch {
-        const updatedChatHistory = newChatHistory.map((msg) =>
-          msg.id === chatHistory.length + 2
-            ? {
-              ...msg,
-              message: 'Sorry, something went wrong.',
-              isLoading: false,
-            }
-            : msg
-        );
-        setChatHistory(updatedChatHistory);
-        updateSessionHistory(updatedChatHistory);
-      } finally {
+        while (response == "" && trial < 6) {
+          const stream = aiSession.promptStreaming(prompt);
+          for await (const chunk of await stream) {
+            response = chunk;
+          }
+          trial++;
+        }
+      } catch (e: any) {
+        console.error(e.message);
         setIsLoading(false);
       }
-    };
 
-    const getAIResponse = async (prompt: string): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Timeout')), 30000);
-        aiSession
-          .prompt(prompt)
-          .then((response) => {
-            clearTimeout(timeout);
-            resolve(response);
-          })
-          .catch(reject);
-      });
+      const updatedChatHistory = newChatHistory.map((msg) =>
+        msg.id === chatHistory.length + 2
+          ? {
+            ...msg,
+            message: response || '',
+            isLoading: false,
+          }
+          : msg
+      );
+      setChatHistory(updatedChatHistory);
+      updateSessionHistory(updatedChatHistory);
+      setIsLoading(false);
     };
 
     const handleFormReset = () => {
@@ -207,42 +193,34 @@ export const Conversation: React.FC<{
         <Separator />
         <div className='flex-1 overflow-y-auto p-4'>
           <div className={cn('text-lg font-medium', !chatHistory.length && 'flex items-center justify-center h-full')}>
-            {isAIAvailable === null ? (
-              'Checking AI availability...'
-            ) : isAIAvailable ? (
-              <>
-                {!chatHistory.length ? (
-                  <div className='text-center font-mono text-2xl'>Start a conversation</div>
-                ) : (
-                  chatHistory.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'
-                        } mb-4`}
-                    >
-                      {msg.isLoading ? (
-                        <div className='w-full max-w-xl p-4 rounded-lg bg-transparent text-card-foreground'>
-                          <LoadingAnimation />
-                        </div>
-                      ) : (
-                        <div
-                          className={`max-w-xl px-4 py-2 rounded-2xl ${msg.role === 'user'
-                            ? 'bg-primary/10'
-                            : 'bg-transparent'
-                            } text-${msg.role === 'user' ? 'primary/90' : 'card-foreground'
-                            }`}
-                        >
-                          {msg.message}
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-                <div ref={chatContainerRef}></div>
-              </>
+            {!chatHistory.length ? (
+              <div className='text-center font-mono text-2xl'>Start a conversation</div>
             ) : (
-              <NotAvailable />
+              chatHistory.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    } mb-4`}
+                >
+                  {msg.isLoading ? (
+                    <div className='w-full max-w-xl p-4 rounded-lg bg-transparent text-card-foreground'>
+                      <LoadingAnimation />
+                    </div>
+                  ) : (
+                    <div
+                      className={`max-w-xl px-4 py-2 rounded-2xl ${msg.role === 'user'
+                        ? 'bg-primary/10'
+                        : 'bg-transparent'
+                        } text-${msg.role === 'user' ? 'primary/90' : 'card-foreground'
+                        }`}
+                    >
+                      {msg.message == "" ? "Something went wrong" : msg.message}
+                    </div>
+                  )}
+                </div>
+              ))
             )}
+            <div ref={chatContainerRef}></div>
           </div>
         </div>
         <div className='bg-input/50 p-4 flex'>

@@ -3,28 +3,41 @@ import { GlowingStarsBackgroundCard } from './ui/glowing-stars';
 
 const Contact: React.FC = () => {
   return (
-    <div className='flex flex-col justify-between gap-6 h-full max-w-5xl m-auto px-4 py-2'>
-      <GlowingStarsBackgroundCard>
-        <h2>Chrome Ai</h2>
-        <p>Blog on Chrome Ai - Gemini Nano</p>
-      </GlowingStarsBackgroundCard>
+    <div className='flex flex-col justify-between gap-6 h-full max-w-6xl m-auto px-4 pb-2'>
 
-      {/* Github */}
-      <div className='flex flex-col items-start justify-start'>
-        <a href='https://github.com/ADROITAKASH/chrome-ai' target="_blank"
-          rel="noopener noreferrer" className="bg-muted text-center w-56 rounded-2xl h-14 relative font-sans text-primary text-lg font-semibold group"
-        >
-          <div
-            className="bg-background/60 backdrop-blur-xl rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[216px] z-10 duration-500"
+      <div className='flex flex-col mx-auto gap-4'>
+        {/* Medium */}
+        <div className="max-w-sm mx-auto bg-card shadow-md rounded-lg overflow-hidden border p-2">
+          <div className="px-4 py-4 bg-card">
+            <p className="text-primary/90 font-mono tracking-wider"><b className='text-primary'>Medium Article</b> on how to setup and how to work with window.ai</p>
+          </div>
+          <GlowingStarsBackgroundCard url="https://link.medium.com/keqpglVxTKb">
+            <div className="pt-2">
+              <h2 className="font-mono tracking-wider font-black text-xl mb-2">Chrome’s Gemini Nano</h2>
+              <p className="font-mono text-sm font-medium text-primary/80">Your Browser Just Got Smarter!</p>
+            </div>
+          </GlowingStarsBackgroundCard>
+        </div>
+
+
+        {/* Github */}
+        <div className='flex flex-col items-start justify-start'>
+          <a href='https://github.com/ADROITAKASH/chrome-ai' target="_blank"
+            rel="noopener noreferrer" className="bg-muted text-center w-56 rounded-2xl h-14 relative font-sans text-primary text-lg font-semibold group"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
-          </div>
-          <div className="flex flex-col justify-center items-start translate-x-[4.5rem]">
-            <p className='text-md font-thin text-left text-base'>OpenSource on</p>
-            <p className="text-left font-mono">GitHub</p>
-          </div>
-        </a>
+            <div
+              className="bg-background/60 backdrop-blur-xl rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[216px] z-10 duration-500"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
+            </div>
+            <div className="flex flex-col justify-center items-start translate-x-[4.5rem]">
+              <p className='text-md font-thin text-left text-base'>OpenSource on</p>
+              <p className="text-left font-mono font-medium">GitHub</p>
+            </div>
+          </a>
+        </div>
       </div>
+
 
       {/* Contact */}
       <div className='flex flex-col gap-5 mt-auto mx-auto'>
